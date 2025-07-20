@@ -2,12 +2,23 @@
 dist/
 build/
 *.spec
-export/
+
+# Ignore files in export folder but keep the folder
+export/*
+!export/.gitkeep
+
+# Ignore files in images folder but keep the folder
+images/*
+!images/.gitkeep
+
+# Ignore files in import folder but keep the folder
+import/*
+!import/.gitkeep
+
+# Media files (if scattered elsewhere)
 *.png
 *.gif
 *.mp4
-images/
-*.png
 
 # Python cache
 __pycache__/
