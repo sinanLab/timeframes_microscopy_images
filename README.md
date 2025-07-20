@@ -8,6 +8,10 @@ A comprehensive GUI application for analyzing microscopy timeframe images, desig
 
 *The main interface of the Microscopy Image Analyzer showing the image viewer, ROI drawing tools, and control panels*
 
+## Application of this App
+
+This application was specifically developed for researchers preparing microscopy images for scientific publications and manuscripts. The primary workflow addresses a common challenge in cell biology research: tracking individual cells across time-series microscopy data and presenting clean, publication-ready images. The app enables researchers to load original microscopy timeframe images, define precise regions of interest (ROI) around target cells or cellular structures, and systematically crop all images in the sequence to maintain consistent framing throughout the time series. This ensures that tracked cells remain centered and properly framed across all timepoints, which is crucial for demonstrating cellular processes, migration patterns, or morphological changes over time. The cropped images can be directly used in manuscript figures, maintaining high quality and consistent presentation standards required for scientific publications. Additionally, the built-in GIF generation feature allows researchers to create animated sequences that effectively demonstrate dynamic cellular processes, providing reviewers and readers with an intuitive visualization of temporal changes. This eliminates the need for multiple software tools and manual image processing, streamlining the workflow from raw microscopy data to publication-ready figures and supplementary animations.
+
 ## Features
 
 - **Image Sequence Loading**: Load and navigate through multiple timeframe images
