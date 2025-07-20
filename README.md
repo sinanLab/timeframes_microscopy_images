@@ -203,4 +203,5 @@ I developed this application entirely on my own to support and accelerate my res
 
 
 ## Contact
-[]
+
+Muhammad Sinan profile: https://www.ippt.pan.pl/en/staff/?osoba=msinan
