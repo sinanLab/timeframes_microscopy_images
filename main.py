@@ -1,5 +1,10 @@
 """
 Setup script for building executable - fixes import paths
+
+Author: Muhammad Sinan
+Institution: Polish Academy of Sciences
+Contact: https://www.ippt.pan.pl/en/staff/?osoba=msinan
+Version: 2.0.0
 """
 
 import sys

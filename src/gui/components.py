@@ -182,7 +182,7 @@ class CroppingControls(ttk.LabelFrame):
         # Callbacks
         self.on_crop_all: Optional[Callable[[], None]] = None
         self.on_save_images: Optional[Callable[[], None]] = None
-        self.on_make_gif: Optional[Callable[[], None]] = None
+        self.on_make_animation: Optional[Callable[[], None]] = None
         
         self._create_widgets()
     
@@ -196,12 +196,12 @@ class CroppingControls(ttk.LabelFrame):
         crop_btn.pack(side=tk.LEFT, expand=True, padx=2)
         
         # Save button
-        save_btn = ttk.Button(button_frame, text="Save", command=self._save_images)
+        save_btn = ttk.Button(button_frame, text="Save Images", command=self._save_images)
         save_btn.pack(side=tk.LEFT, expand=True, padx=2)
         
-        # Make GIF button
-        gif_btn = ttk.Button(button_frame, text="Make GIF", command=self._make_gif)
-        gif_btn.pack(side=tk.LEFT, expand=True, padx=2)
+        # Animation button (replaces Make GIF)
+        animation_btn = ttk.Button(button_frame, text="Make Animation", command=self._make_animation)
+        animation_btn.pack(side=tk.LEFT, expand=True, padx=2)
     
     def _crop_all(self) -> None:
         """Handle crop all button click"""
@@ -213,10 +213,10 @@ class CroppingControls(ttk.LabelFrame):
         if self.on_save_images:
             self.on_save_images()
     
-    def _make_gif(self) -> None:
-        """Handle make GIF button click"""
-        if self.on_make_gif:
-            self.on_make_gif()
+    def _make_animation(self) -> None:
+        """Handle make animation button click"""
+        if self.on_make_animation:
+            self.on_make_animation()
 
 
 class ImageCanvas(ttk.LabelFrame):

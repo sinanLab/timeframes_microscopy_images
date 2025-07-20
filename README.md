@@ -18,9 +18,13 @@ This application was specifically developed for researchers preparing microscopy
 - **Interactive ROI Definition**: Draw, resize, and move regions of interest
 - **Cell Location**: Locate and center on specific cell coordinates
 - **Batch Processing**: Crop all images in a sequence using the defined ROI
-- **Animation Creation**: Generate animated GIFs from cropped image sequences
+- **Professional Animation Creation**: Generate high-quality animated GIFs and MP4 videos with customizable settings
+  - Adjustable frame rates (1-30 FPS)
+  - Multiple quality settings for videos
+  - Professional naming with automatic duplicate handling
+  - Loop control for GIFs
 - **Zoom and Pan**: Interactive image viewing with zoom and pan capabilities
-- **Export Functionality**: Save cropped images and create animations
+- **Export Functionality**: Save cropped images and create professional animations
 
 ## Installation
 
@@ -40,7 +44,7 @@ pip install -r requirements.txt
 Or install individually:
 
 ```bash
-pip install Pillow numpy imageio
+pip install Pillow numpy imageio imageio-ffmpeg
 ```
 
 ## Usage
@@ -48,7 +52,7 @@ pip install Pillow numpy imageio
 ### Running the Application
 
 ```bash
-python main_app.py
+python main.py
 ```
 
 ### Basic Workflow
@@ -59,7 +63,15 @@ python main_app.py
 4. **Locate Cell** (Optional): Enter X,Y coordinates to center the view on a specific cell
 5. **Define ROI**: Click "Draw ROI" and drag to create a region of interest
 6. **Crop Images**: Click "Crop All" to process all images with the defined ROI
-7. **Save Results**: Use "Save" to export cropped images or "Make GIF" to create an animation
+7. **Save Results**: Use "Save Images" to export cropped images or "Make Animation" to create professional animations
+8. **Animation Creation**: When you click "Make Animation", a professional dialog opens where you can:
+   - Choose between GIF or MP4 video format
+   - Set custom frame rate (1-30 FPS) with presets (Slow, Normal, Fast, Very Fast)
+   - Configure filename and output settings
+   - For GIFs: Set loop count and optimization options
+   - For Videos: Choose quality settings (Low, Medium, High, Best)
+   - Preview your settings before creation
+   - Automatic duplicate file handling (adds numbers like "animation (1).gif")
 
 ### Application Interface Overview
 
@@ -73,7 +85,7 @@ The application interface consists of several key components:
 - **Tools Panel** (Right):
   - ROI drawing and management tools
   - Zoom controls (In/Out/Reset)
-  - Processing buttons (Crop All, Save, Make GIF)
+  - Processing buttons (Crop All, Save Images, Make Animation)
   - Pan mode toggle
 - **Status Information**: Current image details and ROI coordinates
 - **Menu Bar**: Access to additional features and settings
@@ -95,6 +107,33 @@ The application interface consists of several key components:
 - **Mouse Wheel**: Zoom in/out at mouse position
 - **Left Click + Drag**: Draw ROI (in draw mode) or move ROI (in edit mode)
 - **Right Click**: Context menu for ROI operations (planned feature)
+
+#### Animation Export Dialog
+When you click "Make Animation", a professional dialog window opens with the following options:
+
+**Format Selection:**
+- **Animated GIF**: Best for simple animations and web sharing
+- **MP4 Video**: Better quality for complex animations and presentations
+
+**Timing Controls:**
+- **Frame Rate Slider**: Adjust from 1-30 FPS with real-time preview
+- **Quick Presets**: Slow (2 FPS), Normal (5 FPS), Fast (10 FPS), Very Fast (20 FPS)
+- **Duration Display**: Shows calculated time per frame
+
+**Output Settings:**
+- **Custom Filename**: Enter your preferred filename
+- **Smart Naming**: Automatic duplicate handling (e.g., "animation (1).gif")
+- **Format Preview**: Shows final filename with extension
+
+**Advanced Options:**
+- **GIF Settings**: Loop count control, file size optimization
+- **Video Settings**: Quality selection (Low, Medium, High, Best)
+- **Preview Panel**: Real-time settings summary and file conflict warnings
+
+**Dialog Buttons:**
+- **📁 Browse Folder**: Change export destination
+- **Cancel**: Close dialog without creating animation
+- **🎬 Export Animation**: Generate and save the final animation file
 
 ## Project Structure
 
@@ -235,4 +274,7 @@ I developed this application entirely on my own to support and accelerate my res
 
 ## Contact
 
-Muhammad Sinan profile: https://www.ippt.pan.pl/en/staff/?osoba=msinan
+**Muhammad Sinan**  
+Polish Academy of Sciences  
+Profile: https://www.ippt.pan.pl/en/staff/?osoba=msinan  
+Email: Contact through institutional profile

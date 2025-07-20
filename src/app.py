@@ -2,6 +2,15 @@
 Main application controller that coordinates between GUI and core logic
 """
 
+"""
+Main application controller for Microscopy Image Analyzer
+
+Author: Muhammad Sinan
+Institution: Polish Academy of Sciences
+Contact: https://www.ippt.pan.pl/en/staff/?osoba=msinan
+Version: 2.0.0
+"""
+
 import tkinter as tk
 from tkinter import messagebox
 from typing import Optional
@@ -9,6 +18,7 @@ from typing import Optional
 from src.gui.main_window import MainWindow
 from src.core.image_processor import ImageProcessor
 from src.core.roi_manager import ROIManager
+from src.gui.animation_dialog import show_animation_export_dialog
 from config.settings import AppConfig
 
 
@@ -56,7 +66,7 @@ class MicroscopyImageAnalyzer:
         if self.window.crop_controls:
             self.window.crop_controls.on_crop_all = self._on_crop_all
             self.window.crop_controls.on_save_images = self._on_save_images
-            self.window.crop_controls.on_make_gif = self._on_make_gif
+            self.window.crop_controls.on_make_animation = self._on_make_animation
         
         # Image canvas events
         if self.window.image_canvas:
@@ -166,15 +176,34 @@ class MicroscopyImageAnalyzer:
                 f"Saved {info['cropped_count']} cropped images to:\\n{export_folder}"
             )
     
-    def _on_make_gif(self) -> None:
-        """Handle create GIF request"""
+    def _on_make_animation(self) -> None:
+        """Handle create animation request with settings dialog"""
         export_folder = self.window.path_controls.get_export_folder() if self.window.path_controls else ""
         if not export_folder:
             messagebox.showwarning("No Folder", "Please select an export folder first.")
             return
         
-        if self.image_processor.create_gif(export_folder):
-            messagebox.showinfo("Success", f"GIF saved to:\\n{export_folder}")
+        # Check if there are cropped images to export
+        if not self.image_processor.cropped_images:
+            messagebox.showwarning("No Images", "Please crop images first before creating animation.")
+            return
+        
+        # Show animation export dialog
+        settings = show_animation_export_dialog(self.window.root, export_folder)
+        if settings is None:
+            return  # User cancelled
+        
+        # Create animation with the specified settings
+        success = self.image_processor.create_animation(settings['export_folder'], settings)
+        
+        if success:
+            format_name = "GIF" if settings['format'] == 'gif' else "Video"
+            messagebox.showinfo(
+                "Success", 
+                f"{format_name} animation saved as:\\n{settings['final_filename']}\\n\\nLocation: {settings['export_folder']}"
+            )
+        else:
+            messagebox.showerror("Error", "Failed to create animation. Please check your settings and try again.")
     
     def _on_mouse_motion(self, event: tk.Event) -> None:
         """Handle mouse motion over canvas"""

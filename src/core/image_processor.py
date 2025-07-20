@@ -290,6 +290,56 @@ class ImageProcessor:
             messagebox.showerror("Error", f"Failed to create GIF: {str(e)}")
             return False
     
+    def create_animation(self, export_folder: str, settings: dict) -> bool:
+        """Create animation (GIF or video) from cropped images with custom settings"""
+        if not self.cropped_images:
+            return False
+            
+        try:
+            os.makedirs(export_folder, exist_ok=True)
+            output_path = os.path.join(export_folder, settings['final_filename'])
+            
+            frames = [np.array(img.convert('RGB')) for img in self.cropped_images]
+            
+            if settings['format'] == 'gif':
+                # Create GIF with custom settings
+                gif_kwargs = {
+                    'duration': settings['duration_per_frame'],
+                    'loop': settings['loop_count']
+                }
+                
+                if settings.get('optimize', True):
+                    gif_kwargs['optimize'] = True
+                    
+                imageio.mimsave(output_path, frames, **gif_kwargs)
+                
+            elif settings['format'] == 'video':
+                # Create MP4 video
+                fps = settings['fps']
+                quality = settings.get('video_quality', 'high')
+                
+                # Quality mapping
+                quality_settings = {
+                    'low': {'quality': 5, 'bitrate': '500k'},
+                    'medium': {'quality': 7, 'bitrate': '1000k'},
+                    'high': {'quality': 8, 'bitrate': '2000k'},
+                    'best': {'quality': 9, 'bitrate': '4000k'}
+                }
+                
+                video_kwargs = {
+                    'fps': fps,
+                    'quality': quality_settings[quality]['quality'],
+                    'bitrate': quality_settings[quality]['bitrate']
+                }
+                
+                imageio.mimsave(output_path, frames, **video_kwargs)
+            
+            return True
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to create animation: {str(e)}")
+            return False
+    
     def get_image_info(self) -> Dict[str, Any]:
         """Get information about current image and loaded images"""
         info = {

@@ -6,10 +6,14 @@ This package provides functionality for:
 - Defining regions of interest (ROI)
 - Cropping image sequences
 - Creating animated GIFs from timeframe data
+
+Author: Muhammad Sinan
+Institution: Polish Academy of Sciences
+Contact: https://www.ippt.pan.pl/en/staff/?osoba=msinan
 """
 
 __version__ = "2.0.0"
-__author__ = "Microscopy Analysis Team"
+__author__ = "Muhammad Sinan"
 
 from .app import MicroscopyImageAnalyzer, main
 
