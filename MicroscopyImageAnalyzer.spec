@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['main_exe.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('config', 'config'), ('src', 'src'), ('import', 'import'), ('export', 'export'), ('README.md', '.')],
+    datas=[('config', 'config'), ('src', 'src')],
     hiddenimports=['PIL._tkinter_finder', 'numpy', 'imageio', 'tkinter', 'tkinter.ttk', 'tkinter.filedialog', 'tkinter.messagebox'],
     hookspath=[],
     hooksconfig={},

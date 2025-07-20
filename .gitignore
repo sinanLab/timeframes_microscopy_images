@@ -11,10 +11,6 @@ export/*
 images/*
 !images/.gitkeep
 
-# Ignore files in import folder but keep the folder
-import/*
-!import/.gitkeep
-
 # Media files (if scattered elsewhere)
 *.png
 *.gif
