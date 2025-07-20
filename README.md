@@ -218,6 +218,10 @@ This software is provided for **non-commercial use only**. The Microscopy Image 
 
 If you wish to use this software for commercial purposes, you **must obtain prior written permission** from the author. Please contact Muhammad Sinan (contact information below) to discuss licensing terms for commercial applications.
 
+### Permission for Individual Use
+
+**For individual users**: While this software is available for non-commercial use, it is **recommended that individual researchers and users contact the author** to inform about their intended use and obtain explicit permission. This helps the author track usage and provide appropriate support when needed.
+
 ### Disclaimer
 
 This software is provided "as is" without warranty of any kind, express or implied. The author shall not be liable for any damages arising from the use of this software.
