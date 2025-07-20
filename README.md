@@ -199,8 +199,9 @@ If you encounter bugs or issues:
 
 ## Contributing
 
-[Add contribution guidelines here]
+I developed this application entirely on my own to support and accelerate my research workflow. From designing the interface to implementing core functionalities, every part of the app was built by me with a clear focus on solving practical challenges in my scientific analysis. It was designed specifically to handle and process microscopy timeframes efficiently, helping me present timeseries images in scientific papers easily and save alot of time. 
+
 
 ## Contact
 
-[Add contact information here]
+[msinan@ippt.pan.pl](https://www.ippt.pan.pl/en/staff/?osoba=msinan)
