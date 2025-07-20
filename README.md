@@ -2,6 +2,12 @@
 
 A comprehensive GUI application for analyzing microscopy timeframe images, designed for researchers working with time-series microscopy data.
 
+## Application Preview
+
+![App Interface](docs/images/app_preview.png)
+
+*The main interface of the Microscopy Image Analyzer showing the image viewer, ROI drawing tools, and control panels*
+
 ## Features
 
 - **Image Sequence Loading**: Load and navigate through multiple timeframe images
@@ -50,6 +56,23 @@ python main_app.py
 5. **Define ROI**: Click "Draw ROI" and drag to create a region of interest
 6. **Crop Images**: Click "Crop All" to process all images with the defined ROI
 7. **Save Results**: Use "Save" to export cropped images or "Make GIF" to create an animation
+
+### Application Interface Overview
+
+The application interface consists of several key components:
+
+- **Main Image Viewer**: Central canvas displaying your microscopy images with zoom and pan capabilities
+- **Control Panel** (Left): 
+  - File browser buttons for input/output folders
+  - Image navigation controls (Previous/Next)
+  - Cell location input fields (X, Y coordinates)
+- **Tools Panel** (Right):
+  - ROI drawing and management tools
+  - Zoom controls (In/Out/Reset)
+  - Processing buttons (Crop All, Save, Make GIF)
+  - Pan mode toggle
+- **Status Information**: Current image details and ROI coordinates
+- **Menu Bar**: Access to additional features and settings
 
 ### Controls
 
