@@ -4,7 +4,7 @@ A comprehensive GUI application for analyzing microscopy timeframe images, desig
 
 ## Application Preview
 
-![App Interface](docs/images/app_preview.png)
+![App Interface](docs/images/software_preview.png)
 
 *The main interface of the Microscopy Image Analyzer showing the image viewer, ROI drawing tools, and control panels*
 
