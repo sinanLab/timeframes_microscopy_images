@@ -58,20 +58,20 @@ python main.py
 ### Basic Workflow
 
 1. **Load Images**: Click "Browse..." next to "Input folder" to select a folder containing your timeframe images
-2. **Set Export Folder**: Click "Browse..." next to "Export folder" to choose where to save results
-3. **Navigate Images**: Use "Previous" and "Next" buttons to browse through your image sequence
-4. **Locate Cell** (Optional): Enter X,Y coordinates to center the view on a specific cell
-5. **Define ROI**: Click "Draw ROI" and drag to create a region of interest
-6. **Crop Images**: Click "Crop All" to process all images with the defined ROI
-7. **Save Results**: Use "Save Images" to export cropped images or "Make Animation" to create professional animations
-8. **Animation Creation**: When you click "Make Animation", a professional dialog opens where you can:
-   - Choose between GIF or MP4 video format
-   - Set custom frame rate (1-30 FPS) with presets (Slow, Normal, Fast, Very Fast)
-   - Configure filename and output settings
-   - For GIFs: Set loop count and optimization options
-   - For Videos: Choose quality settings (Low, Medium, High, Best)
-   - Preview your settings before creation
-   - Automatic duplicate file handling (adds numbers like "animation (1).gif")
+2. **Navigate Images**: Use "Previous" and "Next" buttons to browse through your image sequence
+3. **Locate Cell** (Optional): Enter X,Y coordinates to center the view on a specific cell
+4. **Define ROI**: Click "Draw ROI" and drag to create a region of interest
+5. **Crop Images**: Click "Crop All" to process all images with the defined ROI
+6. **Export Results**: Click "📤 Export" to open the comprehensive export dialog with options for:
+   - **💾 Save Cropped Images**: Export individual PNG/JPEG files
+   - **🎞️ Create Animated GIF**: Generate web-friendly animations
+   - **🎬 Create MP4 Video**: Produce high-quality video animations
+7. **Configure Export**: In the export dialog, you can:
+   - Choose export type (Images, GIF, or Video)
+   - Select destination folder
+   - Set custom filename
+   - Configure animation settings (FPS, quality, loop options)
+   - Preview settings before export
 
 ### Application Interface Overview
 
@@ -79,16 +79,16 @@ The application interface consists of several key components:
 
 - **Main Image Viewer**: Central canvas displaying your microscopy images with zoom and pan capabilities
 - **Control Panel** (Left): 
-  - File browser buttons for input/output folders
+  - File browser for input folder selection
   - Image navigation controls (Previous/Next)
   - Cell location input fields (X, Y coordinates)
 - **Tools Panel** (Right):
   - ROI drawing and management tools
   - Zoom controls (In/Out/Reset)
-  - Processing buttons (Crop All, Save Images, Make Animation)
+  - Processing buttons (Crop All, 📤 Export)
   - Pan mode toggle
 - **Status Information**: Current image details and ROI coordinates
-- **Menu Bar**: Access to additional features and settings
+- **Unified Export System**: Single dialog for all export options (Images, GIF, Video)
 
 ### Controls
 

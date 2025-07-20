@@ -10,33 +10,25 @@ from config.settings import AppConfig, UIConfig
 
 
 class PathControls(ttk.LabelFrame):
-    """Controls for input/output folder paths"""
+    """Controls for input folder path"""
     
     def __init__(self, parent: tk.Widget):
-        super().__init__(parent, text="Paths to folders", padding=UIConfig.FRAME_PADDING)
+        super().__init__(parent, text="Image Source", padding=UIConfig.FRAME_PADDING)
         
         self.input_folder_var = tk.StringVar()
-        self.export_folder_var = tk.StringVar()
         
         # Callbacks
         self.on_input_folder_changed: Optional[Callable[[str], None]] = None
-        self.on_export_folder_changed: Optional[Callable[[str], None]] = None
         
         self._create_widgets()
     
     def _create_widgets(self) -> None:
         """Create path control widgets"""
-        # Input folder
+        # Input folder only
         ttk.Label(self, text="Input folder:").pack(anchor=tk.W)
         self.input_entry = ttk.Entry(self, textvariable=self.input_folder_var)
         self.input_entry.pack(fill=tk.X, pady=2)
         ttk.Button(self, text="Browse...", command=self._browse_input).pack(fill=tk.X, pady=2)
-        
-        # Export folder
-        ttk.Label(self, text="Export folder:", ).pack(anchor=tk.W, pady=(10, 0))
-        self.export_entry = ttk.Entry(self, textvariable=self.export_folder_var)
-        self.export_entry.pack(fill=tk.X, pady=2)
-        ttk.Button(self, text="Browse...", command=self._browse_export).pack(fill=tk.X, pady=2)
     
     def _browse_input(self) -> None:
         """Browse for input folder"""
@@ -46,29 +38,13 @@ class PathControls(ttk.LabelFrame):
             if self.on_input_folder_changed:
                 self.on_input_folder_changed(folder_path)
     
-    def _browse_export(self) -> None:
-        """Browse for export folder"""
-        folder_path = filedialog.askdirectory()
-        if folder_path:
-            self.export_folder_var.set(folder_path)
-            if self.on_export_folder_changed:
-                self.on_export_folder_changed(folder_path)
-    
     def get_input_folder(self) -> str:
-        """Get input folder path"""
+        """Get the current input folder"""
         return self.input_folder_var.get()
-    
-    def get_export_folder(self) -> str:
-        """Get export folder path"""
-        return self.export_folder_var.get()
     
     def set_input_folder(self, path: str) -> None:
         """Set input folder path"""
         self.input_folder_var.set(path)
-    
-    def set_export_folder(self, path: str) -> None:
-        """Set export folder path"""
-        self.export_folder_var.set(path)
 
 
 class CellLocationControls(ttk.LabelFrame):
@@ -181,8 +157,7 @@ class CroppingControls(ttk.LabelFrame):
         
         # Callbacks
         self.on_crop_all: Optional[Callable[[], None]] = None
-        self.on_save_images: Optional[Callable[[], None]] = None
-        self.on_make_animation: Optional[Callable[[], None]] = None
+        self.on_export: Optional[Callable[[], None]] = None
         
         self._create_widgets()
     
@@ -195,28 +170,19 @@ class CroppingControls(ttk.LabelFrame):
         crop_btn = ttk.Button(button_frame, text="Crop All", command=self._crop_all)
         crop_btn.pack(side=tk.LEFT, expand=True, padx=2)
         
-        # Save button
-        save_btn = ttk.Button(button_frame, text="Save Images", command=self._save_images)
-        save_btn.pack(side=tk.LEFT, expand=True, padx=2)
-        
-        # Animation button (replaces Make GIF)
-        animation_btn = ttk.Button(button_frame, text="Make Animation", command=self._make_animation)
-        animation_btn.pack(side=tk.LEFT, expand=True, padx=2)
+        # Single Export button (replaces Save Images and Make Animation)
+        export_btn = ttk.Button(button_frame, text="📤 Export", command=self._export)
+        export_btn.pack(side=tk.LEFT, expand=True, padx=2)
     
     def _crop_all(self) -> None:
         """Handle crop all button click"""
         if self.on_crop_all:
             self.on_crop_all()
     
-    def _save_images(self) -> None:
-        """Handle save images button click"""
-        if self.on_save_images:
-            self.on_save_images()
-    
-    def _make_animation(self) -> None:
-        """Handle make animation button click"""
-        if self.on_make_animation:
-            self.on_make_animation()
+    def _export(self) -> None:
+        """Handle export button click"""
+        if self.on_export:
+            self.on_export()
 
 
 class ImageCanvas(ttk.LabelFrame):

@@ -293,19 +293,76 @@ class ImageProcessor:
     def create_animation(self, export_folder: str, settings: dict) -> bool:
         """Create animation (GIF or video) from cropped images with custom settings"""
         if not self.cropped_images:
+            messagebox.showerror("Error", "No cropped images available for animation.")
             return False
             
         try:
             os.makedirs(export_folder, exist_ok=True)
-            output_path = os.path.join(export_folder, settings['final_filename'])
             
-            frames = [np.array(img.convert('RGB')) for img in self.cropped_images]
+            # Build filename based on export type
+            export_type = settings.get('export_type', 'gif')
+            filename = settings.get('filename', 'animation')
+            extension = ".gif" if export_type == 'gif' else ".mp4"
             
-            if settings['format'] == 'gif':
+            # Generate unique filename if file exists
+            base_path = os.path.join(export_folder, f"{filename}{extension}")
+            output_path = self._get_unique_filename(base_path)
+            
+            # Validate and convert images to frames
+            frames = []
+            for i, img in enumerate(self.cropped_images):
+                if img is None:
+                    messagebox.showerror("Error", f"Image {i+1} is invalid (None). Please crop images again.")
+                    return False
+                try:
+                    # Convert to RGB format for consistency
+                    rgb_img = img.convert('RGB')
+                    frame_array = np.array(rgb_img)
+                    
+                    # Validate frame dimensions and data type
+                    if frame_array.size == 0:
+                        messagebox.showerror("Error", f"Image {i+1} is empty.")
+                        return False
+                    
+                    # Debug: print frame shape
+                    print(f"Frame {i+1} shape: {frame_array.shape}, dtype: {frame_array.dtype}")
+                    
+                    # Ensure frame has correct dimensions (height, width, 3)
+                    if len(frame_array.shape) != 3 or frame_array.shape[2] != 3:
+                        messagebox.showerror("Error", f"Image {i+1} has invalid dimensions: {frame_array.shape}")
+                        return False
+                    
+                    # Ensure uint8 data type and proper range
+                    if frame_array.dtype != np.uint8:
+                        # Convert to uint8 with proper scaling
+                        if frame_array.max() <= 1.0:
+                            frame_array = (frame_array * 255).astype(np.uint8)
+                        else:
+                            frame_array = frame_array.astype(np.uint8)
+                    
+                    # Ensure values are in valid range
+                    frame_array = np.clip(frame_array, 0, 255)
+                    
+                    frames.append(frame_array)
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to process image {i+1}: {str(e)}")
+                    return False
+            
+            if not frames:
+                messagebox.showerror("Error", "No valid frames to create animation.")
+                return False
+            
+            # Debug info
+            print(f"Creating {export_type} with {len(frames)} frames")
+            if frames:
+                print(f"Final frame shape: {frames[0].shape}, dtype: {frames[0].dtype}")
+                print(f"Frame value range: {frames[0].min()} to {frames[0].max()}")
+            
+            if export_type == 'gif':
                 # Create GIF with custom settings
                 gif_kwargs = {
-                    'duration': settings['duration_per_frame'],
-                    'loop': settings['loop_count']
+                    'duration': settings.get('duration_per_frame', 0.2),
+                    'loop': settings.get('loop_count', 0)
                 }
                 
                 if settings.get('optimize', True):
@@ -313,32 +370,87 @@ class ImageProcessor:
                     
                 imageio.mimsave(output_path, frames, **gif_kwargs)
                 
-            elif settings['format'] == 'video':
-                # Create MP4 video
-                fps = settings['fps']
-                quality = settings.get('video_quality', 'high')
+            elif export_type == 'video':
+                # Create MP4 video with simpler approach
+                fps = settings.get('fps', 5.0)
                 
-                # Quality mapping
-                quality_settings = {
-                    'low': {'quality': 5, 'bitrate': '500k'},
-                    'medium': {'quality': 7, 'bitrate': '1000k'},
-                    'high': {'quality': 8, 'bitrate': '2000k'},
-                    'best': {'quality': 9, 'bitrate': '4000k'}
-                }
-                
-                video_kwargs = {
-                    'fps': fps,
-                    'quality': quality_settings[quality]['quality'],
-                    'bitrate': quality_settings[quality]['bitrate']
-                }
-                
-                imageio.mimsave(output_path, frames, **video_kwargs)
+                # Method 1: Try basic imageio approach first
+                try:
+                    # Convert frames to a simple format that imageio can handle
+                    simple_frames = []
+                    for frame in frames:
+                        # Ensure frame is in the right format
+                        if frame.shape[2] == 3:  # RGB
+                            simple_frames.append(frame)
+                        else:
+                            # Convert to RGB if needed
+                            simple_frames.append(frame[:,:,:3])
+                    
+                    # Use basic imageio mimsave
+                    imageio.mimsave(output_path, simple_frames, fps=fps, format='MP4')
+                    print(f"Video created successfully: {output_path}")
+                    
+                except Exception as e1:
+                    print(f"MP4 creation failed: {e1}")
+                    
+                    # Method 2: Try using FFMPEG writer directly
+                    try:
+                        writer = imageio.get_writer(output_path, fps=fps, format='FFMPEG', codec='libx264')
+                        for frame in frames:
+                            writer.append_data(frame)
+                        writer.close()
+                        print(f"Video created with FFMPEG writer: {output_path}")
+                        
+                    except Exception as e2:
+                        print(f"FFMPEG writer failed: {e2}")
+                        
+                        # Method 3: Save as individual images and suggest GIF
+                        temp_dir = os.path.join(export_folder, "temp_frames")
+                        try:
+                            os.makedirs(temp_dir, exist_ok=True)
+                            
+                            # Save frames as individual images
+                            for i, frame in enumerate(frames):
+                                frame_path = os.path.join(temp_dir, f"frame_{i:04d}.png")
+                                Image.fromarray(frame).save(frame_path)
+                            
+                            messagebox.showinfo("Video Creation Alternative", 
+                                f"Video creation failed, but {len(frames)} individual frames have been saved to:\\n"
+                                f"{temp_dir}\\n\\n"
+                                f"You can use external tools like FFmpeg to create a video from these frames.\\n\\n"
+                                f"Alternatively, try using GIF format which works more reliably.")
+                            
+                        except Exception as e3:
+                            messagebox.showerror("Video Creation Failed", 
+                                f"All video creation methods failed:\\n"
+                                f"MP4: {str(e1)}\\n"
+                                f"FFMPEG: {str(e2)}\\n"
+                                f"Frame export: {str(e3)}\\n\\n"
+                                f"Please try using GIF format instead.")
+                            return False
             
             return True
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to create animation: {str(e)}")
             return False
+    
+    def _get_unique_filename(self, filepath: str) -> str:
+        """Generate unique filename to avoid overwriting"""
+        if not os.path.exists(filepath):
+            return filepath
+            
+        directory = os.path.dirname(filepath)
+        basename = os.path.basename(filepath)
+        name, ext = os.path.splitext(basename)
+        
+        counter = 1
+        while True:
+            new_name = f"{name} ({counter}){ext}"
+            new_path = os.path.join(directory, new_name)
+            if not os.path.exists(new_path):
+                return new_path
+            counter += 1
     
     def get_image_info(self) -> Dict[str, Any]:
         """Get information about current image and loaded images"""

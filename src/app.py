@@ -13,12 +13,13 @@ Version: 2.0.0
 
 import tkinter as tk
 from tkinter import messagebox
+import os
 from typing import Optional
 
 from src.gui.main_window import MainWindow
 from src.core.image_processor import ImageProcessor
 from src.core.roi_manager import ROIManager
-from src.gui.animation_dialog import show_animation_export_dialog
+from src.gui.export_dialog import show_export_dialog
 from config.settings import AppConfig
 
 
@@ -34,6 +35,9 @@ class MicroscopyImageAnalyzer:
         # State variables
         self.pan_mode = False
         self.pan_start = {"x": 0, "y": 0}
+        
+        # Export folder persistence
+        self.last_export_folder: Optional[str] = None
         
         # Initialize after window is created
         self._initialize_components()
@@ -65,8 +69,7 @@ class MicroscopyImageAnalyzer:
         # Cropping controls
         if self.window.crop_controls:
             self.window.crop_controls.on_crop_all = self._on_crop_all
-            self.window.crop_controls.on_save_images = self._on_save_images
-            self.window.crop_controls.on_make_animation = self._on_make_animation
+            self.window.crop_controls.on_export = self._on_export
         
         # Image canvas events
         if self.window.image_canvas:
@@ -88,6 +91,10 @@ class MicroscopyImageAnalyzer:
         # Reset button
         if hasattr(self.window, 'reset_button'):
             self.window.reset_button.config(command=self._on_reset_everything)
+            
+        # Set menu callbacks for File menu
+        self.window.on_select_input_folder = self._on_select_input_folder_menu
+        self.window.on_export = self._on_export
     
     def _on_input_folder_changed(self, folder_path: str) -> None:
         """Handle input folder selection"""
@@ -108,6 +115,23 @@ class MicroscopyImageAnalyzer:
         else:
             self.window.update_status("No images found in folder", "error")
             messagebox.showwarning("No Images", "No images found in the selected folder.")
+    
+    def _on_select_input_folder_menu(self) -> None:
+        """Handle input folder selection from File menu"""
+        from tkinter import filedialog
+        
+        folder_path = filedialog.askdirectory(
+            title="Select Input Folder",
+            initialdir=os.getcwd()
+        )
+        
+        if folder_path:
+            # Update the path controls display
+            if self.window.path_controls:
+                self.window.path_controls.set_input_folder(folder_path)
+            
+            # Process the folder
+            self._on_input_folder_changed(folder_path)
     
     def _on_export_folder_changed(self, folder_path: str) -> None:
         """Handle export folder selection"""
@@ -162,48 +186,54 @@ class MicroscopyImageAnalyzer:
                 f"All {info['total_images']} images cropped to ROI: {width}x{height} pixels"
             )
     
-    def _on_save_images(self) -> None:
-        """Handle save cropped images request"""
-        export_folder = self.window.path_controls.get_export_folder() if self.window.path_controls else ""
-        if not export_folder:
-            messagebox.showwarning("No Folder", "Please select an export folder first.")
-            return
-        
-        if self.image_processor.save_cropped_images(export_folder):
-            info = self.image_processor.get_image_info()
-            messagebox.showinfo(
-                "Success", 
-                f"Saved {info['cropped_count']} cropped images to:\\n{export_folder}"
-            )
-    
-    def _on_make_animation(self) -> None:
-        """Handle create animation request with settings dialog"""
-        export_folder = self.window.path_controls.get_export_folder() if self.window.path_controls else ""
-        if not export_folder:
-            messagebox.showwarning("No Folder", "Please select an export folder first.")
-            return
-        
+    def _on_export(self) -> None:
+        """Handle unified export request with comprehensive dialog"""
         # Check if there are cropped images to export
         if not self.image_processor.cropped_images:
-            messagebox.showwarning("No Images", "Please crop images first before creating animation.")
+            messagebox.showwarning("No Images", "Please crop images first before exporting.")
             return
         
-        # Show animation export dialog
-        settings = show_animation_export_dialog(self.window.root, export_folder)
+        # Determine default folder based on previous export or input folder
+        if self.last_export_folder:
+            # Use previously selected export folder
+            default_folder = self.last_export_folder
+        else:
+            # First time export - get a reasonable default folder
+            input_folder = self.window.path_controls.get_input_folder() if self.window.path_controls else ""
+            default_folder = os.path.dirname(input_folder) if input_folder else os.getcwd()
+        
+        # Show comprehensive export dialog
+        settings = show_export_dialog(self.window.root, default_folder)
         if settings is None:
             return  # User cancelled
         
-        # Create animation with the specified settings
-        success = self.image_processor.create_animation(settings['export_folder'], settings)
+        # Remember the export folder for future exports
+        self.last_export_folder = settings['export_folder']
         
-        if success:
-            format_name = "GIF" if settings['format'] == 'gif' else "Video"
-            messagebox.showinfo(
-                "Success", 
-                f"{format_name} animation saved as:\\n{settings['final_filename']}\\n\\nLocation: {settings['export_folder']}"
-            )
+        # Perform the appropriate export based on selection
+        success = False
+        if settings['export_type'] == 'images':
+            success = self.image_processor.save_cropped_images(settings['export_folder'])
+            if success:
+                info = self.image_processor.get_image_info()
+                messagebox.showinfo(
+                    "Success", 
+                    f"✅ Saved {info['cropped_count']} cropped images to:\\n{settings['export_folder']}"
+                )
         else:
-            messagebox.showerror("Error", "Failed to create animation. Please check your settings and try again.")
+            # Create animation (GIF or Video)
+            success = self.image_processor.create_animation(settings['export_folder'], settings)
+            if success:
+                format_name = "GIF" if settings['export_type'] == 'gif' else "Video"
+                extension = ".gif" if settings['export_type'] == 'gif' else ".mp4"
+                final_filename = f"{settings['filename']}{extension}"
+                messagebox.showinfo(
+                    "Success", 
+                    f"✅ {format_name} animation created successfully!\\n\\nFile: {final_filename}\\nLocation: {settings['export_folder']}"
+                )
+        
+        if not success:
+            messagebox.showerror("Error", "❌ Export failed. Please check your settings and try again.")
     
     def _on_mouse_motion(self, event: tk.Event) -> None:
         """Handle mouse motion over canvas"""
