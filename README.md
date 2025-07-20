@@ -195,7 +195,34 @@ If you encounter bugs or issues:
 
 ## License
 
-[Add your license information here]
+**Non-Commercial License**
+
+This software is provided for **non-commercial use only**. The Microscopy Image Analyzer is made available for:
+
+- **Academic research and educational purposes**
+- **Personal scientific projects**
+- **Non-profit research institutions**
+- **Scientific publications and manuscript preparation**
+
+### Commercial Use Restrictions
+
+**Commercial use of this software is strictly prohibited** without explicit written permission from the author. Commercial use includes, but is not limited to:
+
+- Use in commercial research and development
+- Integration into commercial software products
+- Use by for-profit organizations for business purposes
+- Redistribution for commercial gain
+- Use in commercial laboratories or services
+
+### Permission for Commercial Use
+
+If you wish to use this software for commercial purposes, you **must obtain prior written permission** from the author. Please contact Muhammad Sinan (contact information below) to discuss licensing terms for commercial applications.
+
+### Disclaimer
+
+This software is provided "as is" without warranty of any kind, express or implied. The author shall not be liable for any damages arising from the use of this software.
+
+By using this software, you agree to these license terms and confirm that your use falls within the permitted non-commercial scope.
 
 ## Contributing
 
