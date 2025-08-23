@@ -22,47 +22,53 @@ def safe_remove_dir(path):
     if not Path(path).exists():
         return True
     
-    for attempt in range(3):
+    path = Path(path)
+    for attempt in range(5):  # Increased retries
         try:
-            shutil.rmtree(path)
+            if path.is_file():
+                path.unlink()
+            else:
+                shutil.rmtree(path, ignore_errors=True)
             print(f"✅ Cleaned {path}")
             return True
         except PermissionError:
-            if attempt < 2:
+            if attempt < 4:  # Increased wait time
                 print(f"⚠️ {path} locked, waiting...")
-                time.sleep(3)
+                time.sleep(5)  # Longer wait time
             else:
                 print(f"⚠️ Skipping {path} (locked by system)")
                 return False
-        except Exception as e:
-            print(f"⚠️ Error cleaning {path}: {e}")
-            return False
+        except OSError as e:
+            if attempt < 4:
+                print(f"⚠️ {path} access error, retrying... ({e})")
+                time.sleep(5)
+            else:
+                print(f"⚠️ Failed to remove {path}: {e}")
+                return False
 
 def main():
     """Simple build process"""
     
     print("🔬 MICROSCOPY IMAGE ANALYZER - SIMPLE BUILD")
     print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"👨‍🔬 Author: Muhammad Sinan")
+    print("👨‍🔬 Author: Muhammad Sinan")
     print("="*50)
     
     # Change to project directory
     project_dir = Path(__file__).parent
     os.chdir(project_dir)
     
-    # Clean previous builds (skip if locked)
-    print("🧹 Cleaning previous builds...")
-    safe_remove_dir("build")
-    safe_remove_dir("dist")
-    
-    # Remove spec files
-    for spec_file in project_dir.glob("*.spec"):
+    # Clean previous builds
+    print("\n🧹 Cleaning previous builds...")
+    safe_remove_dir('build')
+    safe_remove_dir('dist')
+    for file in Path('.').glob('*.spec'):
         try:
-            spec_file.unlink()
-            print(f"✅ Removed {spec_file.name}")
-        except:
-            pass
-    
+            file.unlink()
+            print(f"✅ Removed {file}")
+        except OSError as e:
+            print(f"⚠️ Could not remove {file}: {e}")
+
     # Check PyInstaller
     print("\n📦 Checking PyInstaller...")
     try:
@@ -74,46 +80,69 @@ def main():
         subprocess.run([sys.executable, "-m", "pip", "install", "pyinstaller"], check=True)
         print("✅ PyInstaller installed")
     
-    # Build executable
-    print("\n🔨 Building executable...")
+    # Prepare PyInstaller command
+    app_name = "MicroscopyImageAnalyzer"
+    main_script = "main.py"
     
     cmd = [
         sys.executable, "-m", "PyInstaller",
-        "--name=MicroscopyImageAnalyzer",
-        "--onefile",
-        "--windowed", 
-        "--noconfirm",
-        "--add-data=config;config",
-        "--add-data=src;src",
-        "--hidden-import=tkinter",
-        "--hidden-import=tkinter.ttk",
-        "--hidden-import=tkinter.filedialog", 
-        "--hidden-import=tkinter.messagebox",
-        "--hidden-import=PIL._tkinter_finder",
-        "main.py"
+        f"--name={app_name}",
+        "--onefile",  # Create a single executable
+        "--windowed",  # Don't show console window
+        "--clean",    # Clean PyInstaller cache
+        "--noconfirm",  # Replace output directory without asking
+        "--add-data", "config;config",
+        "--add-data", "src;src",
+        "--hidden-import", "tkinter",
+        "--hidden-import", "tkinter.ttk",
+        "--hidden-import", "tkinter.filedialog",
+        "--hidden-import", "tkinter.messagebox",
+        "--hidden-import", "PIL._tkinter_finder",  # Required for Pillow
+        "--hidden-import", "imageio",
+        "--hidden-import", "imageio.plugins",
+        "--hidden-import", "imageio.plugins.ffmpeg",
+        "--hidden-import", "imageio_ffmpeg",
+        "--hidden-import", "imageio_ffmpeg._utils",
+        "--collect-submodules", "imageio",
+        "--collect-submodules", "numpy",
+        main_script
     ]
     
+    # Check for assets directory
+    assets_path = Path("src/gui/assets")
+    if assets_path.exists():
+        cmd.extend(["--add-data", f"{assets_path};src/gui/assets"])
+        # Check for icon file
+        icon_file = assets_path / "icon.ico"
+        if icon_file.exists():
+            cmd.extend(["--icon", str(icon_file)])
+    
+    print("\n🛠️ Building executable...")
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print("✅ Build completed!")
+        exe_path = project_dir / "dist" / f"{app_name}.exe"
+        if exe_path.exists():
+            size_mb = exe_path.stat().st_size / 1024 / 1024
+            print("\n✅ Build completed successfully!")
+            print(f"📦 Executable: {exe_path}")
+            print(f"💾 Size: {size_mb:.1f} MB")
+            print(f"\n▶️ Run with: {exe_path}")
+            return True
+        else:
+            print("\n❌ Build completed but executable not found")
+            return False
     except subprocess.CalledProcessError as e:
-        print("❌ Build failed!")
-        print(f"Error: {e.stderr}")
+        print(f"\n❌ Build failed with error: {e}")
+        if hasattr(e, 'output') and e.output:
+            print("Build output:")
+            print(e.output)
+        if hasattr(e, 'stderr') and e.stderr:
+            print("Error output:")
+            print(e.stderr)
         return False
-    
-    # Check result
-    exe_path = project_dir / "dist" / "MicroscopyImageAnalyzer.exe"
-    if exe_path.exists():
-        size_mb = exe_path.stat().st_size / 1024 / 1024
-        print(f"\n🎉 SUCCESS!")
-        print(f"📦 Executable: {exe_path}")
-        print(f"💾 Size: {size_mb:.1f} MB")
-        print(f"\n▶️ Run with: {exe_path}")
-    else:
-        print("❌ Executable not found!")
+    except OSError as e:
+        print(f"\n❌ System error during build: {e}")
         return False
-    
-    return True
 
 if __name__ == "__main__":
     try:

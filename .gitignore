@@ -2,6 +2,7 @@
 dist/
 build/
 *.spec
+*.yml
 
 # Ignore files in export folder but keep the folder
 export/*
