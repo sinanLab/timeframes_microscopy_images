@@ -86,6 +86,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+*future_updates.txt
 
 # Export folder contents (optional - remove if you want to track example exports)
 # export/*.png
