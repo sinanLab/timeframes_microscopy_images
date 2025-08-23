@@ -1,0 +1,6 @@
+- When locate a cell, and toggle on the cell, lets record the nuclear and peri nuclear intensities of the cell for all the timeseries images.
+- Manually locate a cell through a mouse 
+- add a license/ very strict technique
+- make movies for the new uploaded raw images.
+- add annotation on the cropped images, such as a targeted cell with a start or any other shape
+- packaging app using the method: https://www.pythonguis.com/tutorials/packaging-tkinter-applications-windows-pyinstaller/
